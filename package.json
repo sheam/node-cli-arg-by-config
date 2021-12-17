@@ -1,6 +1,6 @@
 {
   "name": "node-cli-arg-by-config",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "homepage": "https://github.com/sheam/node-cli-arg-by-config",
   "keywords": [
     "cli",
