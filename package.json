@@ -1,6 +1,6 @@
 {
   "name": "node-cli-arg-by-config",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "homepage": "https://github.com/sheam/node-cli-arg-by-config",
   "keywords": [
     "cli",
@@ -48,9 +48,5 @@
     "*.{ts,tsx}": [
       "tsfmt -r"
     ]
-  },
-  "dependencies": {
-    "node-cli-arg-by-config": "^0.10.2",
-    "node-gyp": "^8.4.1"
   }
 }
