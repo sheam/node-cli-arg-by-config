@@ -1,6 +1,6 @@
 import { processArgs } from "./processing";
-import {IArgDef, IArgsConfig} from "./types";
-import {printHelp, validateArgDefinitions} from "./definitions";
+import { IArgDef, IArgsConfig } from "./types";
+import { printHelp, validateArgDefinitions } from "./definitions";
 
 export type {
     IArgsConfig,

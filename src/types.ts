@@ -12,12 +12,12 @@
 export interface IArgDef<TVal>
 {
     readonly name: string;
-    readonly type?: 'string'|'int'|'float'|'date'|'boolean';
+    readonly type?: 'string' | 'int' | 'float' | 'date' | 'boolean';
     readonly description?: string;
     readonly index?: number;
     readonly required?: boolean;
     readonly factory?: (stringValue: string) => TVal;
-    readonly validator?: (val: TVal) => string|null;
+    readonly validator?: (val: TVal) => string | null;
 }
 
 /**

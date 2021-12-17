@@ -1,33 +1,33 @@
-import {IArgDef, IArgsConfig} from "./types";
-import {getIndexedDefinitions, getNamedDefinitions, printHelp, validateArgDefinitions} from "./definitions";
+import { IArgDef, IArgsConfig } from "./types";
+import { getIndexedDefinitions, getNamedDefinitions, printHelp, validateArgDefinitions } from "./definitions";
 
 function getTypedValue<TVal>(strVal: string, def: IArgDef<TVal>): TVal
 {
     let val: any;
-    const type = def.type||'string';
-    switch(type)
+    const type = def.type || 'string';
+    switch (type)
     {
         case 'string':
             val = strVal;
             break;
         case 'int':
             val = parseInt(strVal);
-            if(isNaN(val)) val = null;
+            if (isNaN(val)) val = null;
             break;
         case 'float':
             val = parseFloat(strVal);
-            if(isNaN(val)) val = null;
+            if (isNaN(val)) val = null;
             break;
         case 'date':
             val = new Date(strVal);
-            if(isNaN(val.getTime())) val = null;
+            if (isNaN(val.getTime())) val = null;
             break;
         case 'boolean':
-            if(!strVal || strVal === 'true')
+            if (!strVal || strVal === 'true')
             {
                 val = true;
             }
-            else if(strVal === 'false')
+            else if (strVal === 'false')
             {
                 val = false;
             }
@@ -37,7 +37,7 @@ function getTypedValue<TVal>(strVal: string, def: IArgDef<TVal>): TVal
             }
             break;
     }
-    if(val === null)
+    if (val === null)
     {
         throw new Error(`Unable to convert argument ${def.name} with value '${strVal}' into a value of type ${type}`);
     }
@@ -46,20 +46,21 @@ function getTypedValue<TVal>(strVal: string, def: IArgDef<TVal>): TVal
 
 function getFactoryValue<TVal>(strVal: string, def: IArgDef<TVal>): TVal
 {
-    if(!def.factory)
+    if (!def.factory)
     {
         throw new Error(`no factory specified for ${def.name}`);
     }
 
     let val: TVal;
-    try {
+    try
+    {
         val = def.factory(strVal);
     }
-    catch(e)
+    catch (e)
     {
         throw new Error(`failed creating value for argument ${def.name} from '${strVal}'`);
     }
-    if(!val)
+    if (!val)
     {
         throw new Error(`failed create valid value for argument ${def.name} from '${strVal}'`);
     }
@@ -69,10 +70,10 @@ function getFactoryValue<TVal>(strVal: string, def: IArgDef<TVal>): TVal
 function getValidValue<TVal>(strVal: string, def: IArgDef<TVal>): TVal
 {
     const val = def.factory ? getFactoryValue(strVal, def) : getTypedValue(strVal, def);
-    if(def.validator)
+    if (def.validator)
     {
         const err = def.validator(val);
-        if(err)
+        if (err)
         {
             throw new Error(`Value for '${def.name}' failed validation: ${err}`);
         }
@@ -83,7 +84,7 @@ function getValidValue<TVal>(strVal: string, def: IArgDef<TVal>): TVal
 function getNamedArgVal(arg: string, namedDefinitions: IArgDef<any>[]): { name: string, strVal: string, def: IArgDef<any> }
 {
     const match = arg.match(/--(\w+)=(.+)/);
-    if(!match)
+    if (!match)
     {
         throw new Error(`'${arg}' does not appear to be a valid named or positional argument`);
     }
@@ -91,7 +92,7 @@ function getNamedArgVal(arg: string, namedDefinitions: IArgDef<any>[]): { name: 
     const strVal = match[2];
 
     const def = namedDefinitions.find(d => d.name === name);
-    if(!def)
+    if (!def)
     {
         throw new Error(`Could not find a definition for argument '${arg}' with name '${name}' and value '${strVal}'`);
     }
@@ -105,7 +106,7 @@ function getNamedArgVal(arg: string, namedDefinitions: IArgDef<any>[]): { name: 
 
 function getArgs<TArgObj>(config: IArgsConfig): TArgObj
 {
-    const {definitions} = config;
+    const { definitions } = config;
     validateArgDefinitions(config);
 
     const args = process.argv.slice(2);
@@ -113,25 +114,25 @@ function getArgs<TArgObj>(config: IArgsConfig): TArgObj
 
     const indexedDefinitions = getIndexedDefinitions(definitions);
     const namedDefinitions = getNamedDefinitions(definitions);
-    for(const a of indexedDefinitions)
+    for (const a of indexedDefinitions)
     {
-        if(typeof(a.index) !== 'number') throw new Error(`invalid index value`);
+        if (typeof (a.index) !== 'number') throw new Error(`invalid index value`);
 
         const strVal = args[a.index];
-        if(!strVal)
+        if (!strVal)
         {
-            throw new Error(`'${a.name}' at position ${a.index+1} is missing a value`);
+            throw new Error(`'${a.name}' at position ${a.index + 1} is missing a value`);
         }
-        if(strVal.startsWith('--'))
+        if (strVal.startsWith('--'))
         {
-            throw new Error(`'${a.name}' at position ${a.index+1} must not contain hyphens in its value`);
+            throw new Error(`'${a.name}' at position ${a.index + 1} must not contain hyphens in its value`);
         }
 
         resultObj[a.name] = getValidValue(strVal, a);
     }
 
     const remainingArgs = args.slice(indexedDefinitions.length);
-    for(const arg of remainingArgs)
+    for (const arg of remainingArgs)
     {
         const result = getNamedArgVal(arg, namedDefinitions);
         const value = getValidValue(result.strVal, result.def);
@@ -139,10 +140,10 @@ function getArgs<TArgObj>(config: IArgsConfig): TArgObj
     }
 
     const requiredDefinitions = namedDefinitions.filter(x => x.required);
-    for(const a of requiredDefinitions)
+    for (const a of requiredDefinitions)
     {
-        const hasVal = typeof(resultObj[a.name]) !== 'undefined';
-        if(!hasVal)
+        const hasVal = typeof (resultObj[a.name]) !== 'undefined';
+        if (!hasVal)
         {
             throw new Error(`'${a.name}' is required, but no value was specified for it.`);
         }
@@ -156,11 +157,11 @@ function getArgs<TArgObj>(config: IArgsConfig): TArgObj
  * @param config the configuration of your command line.
  * @returns the built out object, or null if unable to parse commands.
  */
-export function processArgs<TArgObj>(config: IArgsConfig): TArgObj|null
+export function processArgs<TArgObj>(config: IArgsConfig): TArgObj | null
 {
-    if(!config.disableMinusH)
+    if (!config.disableMinusH)
     {
-        if(process.argv.indexOf('--help') >= 0 || process.argv.indexOf('-h') >= 0)
+        if (process.argv.indexOf('--help') >= 0 || process.argv.indexOf('-h') >= 0)
         {
             printHelp(config);
             return null;
@@ -171,9 +172,9 @@ export function processArgs<TArgObj>(config: IArgsConfig): TArgObj|null
     {
         return getArgs<TArgObj>(config);
     }
-    catch(e: any)
+    catch (e: any)
     {
-        if(e.message)
+        if (e.message)
         {
             console.log(e.message);
         }
