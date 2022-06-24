@@ -68,7 +68,6 @@ describe('argument parsing', () =>
             expect(() => getFactoryValue('eleven', { name: 'arg1', factory: sampleNumberFactory })).toThrow('');
         });
     });
-    describe('factory parsing', () => { });
     describe('positional arguments', () =>
     {
         test('get correct string values', () =>
@@ -265,6 +264,113 @@ describe('argument parsing', () =>
             {
                 expect(result.one).toBe('ONE');
                 expect(result.three).toBe(333);
+            }
+        });
+
+        test('get correct boolean value (true)', () => {
+            interface IArgs
+            {
+                one?: string;
+                flag: boolean;
+            }
+
+            const argDefs: IArgDef<any>[] = [
+                {name: 'one'},
+                {name: 'flag', type: 'boolean'}
+            ];
+
+            process.argv = [
+                'ts-node',
+                'my-script',
+                '--one=testingstring',
+                '--flag=true'
+            ];
+
+            const result = getArgs<IArgs>({ definitions: argDefs });
+            expect(result).not.toBeNull();
+            if(result)
+            {
+                expect(result.flag).toBe(true);
+            }
+        });
+
+        test('get correct boolean value (false)', () => {
+            interface IArgs
+            {
+                one?: string;
+                flag: boolean;
+            }
+
+            const argDefs: IArgDef<any>[] = [
+                {name: 'one'},
+                {name: 'flag', type: 'boolean'}
+            ];
+
+            process.argv = [
+                'ts-node',
+                'my-script',
+                '--one=testingstring',
+                '--flag=false'
+            ];
+
+            const result = getArgs<IArgs>({ definitions: argDefs });
+            expect(result).not.toBeNull();
+            if(result)
+            {
+                expect(result.flag).toBe(false);
+            }
+        });
+
+        test('get correct boolean value (undefined)', () => {
+            interface IArgs
+            {
+                one?: string;
+                flag: boolean;
+            }
+
+            const argDefs: IArgDef<any>[] = [
+                {name: 'one'},
+                {name: 'flag', type: 'boolean'}
+            ];
+
+            process.argv = [
+                'ts-node',
+                'my-script',
+                '--one=testingstring',
+            ];
+
+            const result = getArgs<IArgs>({ definitions: argDefs });
+            expect(result).not.toBeNull();
+            if(result)
+            {
+                expect(result.flag).toBeUndefined();
+            }
+        });
+
+        test('get correct boolean value (true without flag)', () => {
+            interface IArgs
+            {
+                one?: string;
+                flag: boolean;
+            }
+
+            const argDefs: IArgDef<any>[] = [
+                {name: 'one'},
+                {name: 'flag', type: 'boolean'}
+            ];
+
+            process.argv = [
+                'ts-node',
+                'my-script',
+                '--one=testingstring',
+                "--flag"
+            ];
+
+            const result = getArgs<IArgs>({ definitions: argDefs });
+            expect(result).not.toBeNull();
+            if(result)
+            {
+                expect(result.flag).toBe(true);
             }
         });
     });

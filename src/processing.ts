@@ -83,18 +83,22 @@ function getValidValue<TVal>(strVal: string, def: IArgDef<TVal>): TVal
 
 function getNamedArgVal(arg: string, namedDefinitions: IArgDef<any>[]): { name: string, strVal: string, def: IArgDef<any> }
 {
-    const match = arg.match(/--(\w+)=(.+)/);
+    const match = arg.match(/--(\w+)(=(.+))?/);
     if (!match)
     {
         throw new Error(`'${arg}' does not appear to be a valid named or positional argument`);
     }
     const name = match[1];
-    const strVal = match[2];
-
+    let strVal = match[3];
     const def = namedDefinitions.find(d => d.name === name);
     if (!def)
     {
         throw new Error(`Could not find a definition for argument '${arg}' with name '${name}' and value '${strVal}'`);
+    }
+
+    if(strVal === undefined && def.type === 'boolean')
+    {
+        strVal = 'true';
     }
 
     return {
@@ -176,7 +180,7 @@ export function processArgs<TArgObj>(config: IArgsConfig): TArgObj | null
     {
         if (e.message)
         {
-            console.log(e.message);
+            console.warn(e.message);
         }
         else
         {
