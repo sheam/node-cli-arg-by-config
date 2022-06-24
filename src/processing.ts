@@ -96,7 +96,7 @@ function getNamedArgVal(arg: string, namedDefinitions: IArgDef<any>[]): { name: 
         throw new Error(`Could not find a definition for argument '${arg}' with name '${name}' and value '${strVal}'`);
     }
 
-    if(strVal === undefined && def.type === 'boolean')
+    if (strVal === undefined && def.type === 'boolean')
     {
         strVal = 'true';
     }

@@ -267,7 +267,8 @@ describe('argument parsing', () =>
             }
         });
 
-        test('get correct boolean value (true)', () => {
+        test('get correct boolean value (true)', () =>
+        {
             interface IArgs
             {
                 one?: string;
@@ -275,8 +276,8 @@ describe('argument parsing', () =>
             }
 
             const argDefs: IArgDef<any>[] = [
-                {name: 'one'},
-                {name: 'flag', type: 'boolean'}
+                { name: 'one' },
+                { name: 'flag', type: 'boolean' }
             ];
 
             process.argv = [
@@ -288,13 +289,14 @@ describe('argument parsing', () =>
 
             const result = getArgs<IArgs>({ definitions: argDefs });
             expect(result).not.toBeNull();
-            if(result)
+            if (result)
             {
                 expect(result.flag).toBe(true);
             }
         });
 
-        test('get correct boolean value (false)', () => {
+        test('get correct boolean value (false)', () =>
+        {
             interface IArgs
             {
                 one?: string;
@@ -302,8 +304,8 @@ describe('argument parsing', () =>
             }
 
             const argDefs: IArgDef<any>[] = [
-                {name: 'one'},
-                {name: 'flag', type: 'boolean'}
+                { name: 'one' },
+                { name: 'flag', type: 'boolean' }
             ];
 
             process.argv = [
@@ -315,13 +317,14 @@ describe('argument parsing', () =>
 
             const result = getArgs<IArgs>({ definitions: argDefs });
             expect(result).not.toBeNull();
-            if(result)
+            if (result)
             {
                 expect(result.flag).toBe(false);
             }
         });
 
-        test('get correct boolean value (undefined)', () => {
+        test('get correct boolean value (undefined)', () =>
+        {
             interface IArgs
             {
                 one?: string;
@@ -329,8 +332,8 @@ describe('argument parsing', () =>
             }
 
             const argDefs: IArgDef<any>[] = [
-                {name: 'one'},
-                {name: 'flag', type: 'boolean'}
+                { name: 'one' },
+                { name: 'flag', type: 'boolean' }
             ];
 
             process.argv = [
@@ -341,13 +344,14 @@ describe('argument parsing', () =>
 
             const result = getArgs<IArgs>({ definitions: argDefs });
             expect(result).not.toBeNull();
-            if(result)
+            if (result)
             {
                 expect(result.flag).toBeUndefined();
             }
         });
 
-        test('get correct boolean value (true without flag)', () => {
+        test('get correct boolean value (true without flag)', () =>
+        {
             interface IArgs
             {
                 one?: string;
@@ -355,8 +359,8 @@ describe('argument parsing', () =>
             }
 
             const argDefs: IArgDef<any>[] = [
-                {name: 'one'},
-                {name: 'flag', type: 'boolean'}
+                { name: 'one' },
+                { name: 'flag', type: 'boolean' }
             ];
 
             process.argv = [
@@ -368,7 +372,7 @@ describe('argument parsing', () =>
 
             const result = getArgs<IArgs>({ definitions: argDefs });
             expect(result).not.toBeNull();
-            if(result)
+            if (result)
             {
                 expect(result.flag).toBe(true);
             }

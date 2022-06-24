@@ -7,7 +7,8 @@ export type {
     IArgDef
 }
 
-export {
+export
+{
     processArgs,
     printHelp,
     validateArgDefinitions,
