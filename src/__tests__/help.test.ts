@@ -3,7 +3,7 @@ import { printHelp } from "../definitions";
 
 describe('help', () =>
 {
-    test('prints header', () =>
+    it('prints header', () =>
     {
         const config: IArgsConfig = {
             helpHeader: 'This is my header',
@@ -26,7 +26,7 @@ describe('help', () =>
         expect(logged).toContain('comes first');
         expect(logged).toContain('--help');
     });
-    test('honour help flag', () =>
+    it('honour help flag', () =>
     {
         const config: IArgsConfig = {
             helpHeader: 'This is my header',

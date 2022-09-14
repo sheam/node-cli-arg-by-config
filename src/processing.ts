@@ -118,24 +118,31 @@ function getArgs<TArgObj>(config: IArgsConfig): TArgObj
 
     const indexedDefinitions = getIndexedDefinitions(definitions);
     const namedDefinitions = getNamedDefinitions(definitions);
+    let numPositionalPresent = 0;
     for (const a of indexedDefinitions)
     {
         if (typeof (a.index) !== 'number') throw new Error(`invalid index value`);
 
         const strVal = args[a.index];
-        if (!strVal)
-        {
-            throw new Error(`'${a.name}' at position ${a.index + 1} is missing a value`);
-        }
-        if (strVal.startsWith('--'))
-        {
-            throw new Error(`'${a.name}' at position ${a.index + 1} must not contain hyphens in its value`);
-        }
 
+        const optional = a.required === false;
+
+        if (!strVal || strVal.startsWith('--'))
+        {
+            if(!optional)
+            {
+                throw new Error(`'${a.name}' at position ${a.index + 1} is missing a value`);
+            }
+            else
+            {
+                break; //only last indexed argument can be positional
+            }
+        }
+        numPositionalPresent++;
         resultObj[a.name] = getValidValue(strVal, a);
     }
 
-    const remainingArgs = args.slice(indexedDefinitions.length);
+    const remainingArgs = args.slice(numPositionalPresent);
     for (const arg of remainingArgs)
     {
         const result = getNamedArgVal(arg, namedDefinitions);

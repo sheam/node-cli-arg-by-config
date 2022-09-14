@@ -24,9 +24,10 @@ export function validateArgDefinitions(config: IArgsConfig): void
         {
             throw new Error(`Definition for argument '${a.name}' has an invalid index value (${a.index}). Should it be ${i}?`);
         }
-        if (typeof (a.required) !== 'undefined' && a.required !== true)
+
+        if (a.required === false && i !== indexed.length - 1) //only the last indexed argument can be null
         {
-            throw new Error(`Definition for argument '${a.name}' has an invalid value (${a.required}) for 'required'. Positional arguments are always required.`);
+            throw new Error(`Definition for argument '${a.name}' has an invalid value (${a.required}) for 'required'. Only the last indexed argument can be optional.`);
         }
     }
 
@@ -65,7 +66,7 @@ export function printHelp(config: IArgsConfig): void
     lines.push('Run command as:');
 
     const indexed = getIndexedDefinitions(definitions);
-    const indexedNames = indexed.map(d => `<${d.name}>`).join(' ');
+    const indexedNames = indexed.map(d => d.required === false ? `[${d.name}]` : `<${d.name}>`).join(' ');
     lines.push(`   ${argv[0]} ${argv[1]} ${indexedNames} [other arguments]`);
     for (const d of indexed)
     {

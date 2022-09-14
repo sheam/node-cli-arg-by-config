@@ -12,12 +12,12 @@ describe('value validation', () =>
         }
         return null;
     }
-    test('number passes validation', () =>
+    it('number passes validation', () =>
     {
         const val = getValidValue('9', { name: 'num', type: 'int', validator: betweenOneAnd10 });
         expect(val).toBe(9);
     });
-    test('number fails validation', () =>
+    it('number fails validation', () =>
     {
         expect(() => getValidValue('19', { name: 'num', type: 'int', validator: betweenOneAnd10 })).toThrow(betweenOneAnd10Err);
     });

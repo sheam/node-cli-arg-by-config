@@ -9,68 +9,68 @@ describe('argument parsing', () =>
 {
     describe('typed parsing', () =>
     {
-        test('valid string', () =>
+        it('valid string', () =>
         {
             const result = getTypedValue('one', { name: 'arg1', type: 'string' });
             expect(result).toBe('one');
         });
-        test('valid int', () =>
+        it('valid int', () =>
         {
             const result = getTypedValue('11', { name: 'arg1', type: 'int' });
             expect(result).toBe(11);
         });
-        test('invalid int', () =>
+        it('invalid int', () =>
         {
             expect(() => getTypedValue('eleven', { name: 'arg1', type: 'int' })).toThrow("Unable to convert argument arg1 with value 'eleven' into a value of type int");
         });
-        test('valid float', () =>
+        it('valid float', () =>
         {
             const result = getTypedValue('11.1', { name: 'arg1', type: 'float' });
             expect(result).toBe(11.1);
         });
-        test('invalid float', () =>
+        it('invalid float', () =>
         {
             expect(() => getTypedValue('eleven point one', { name: 'arg1', type: 'float' })).toThrow("Unable to convert argument arg1 with value 'eleven point one' into a value of type float");
         });
-        test('valid implied boolean', () =>
+        it('valid implied boolean', () =>
         {
             const result = getTypedValue('', { name: 'arg1', type: 'boolean' });
             expect(result).toBe(true);
         });
-        test('valid true boolean', () =>
+        it('valid true boolean', () =>
         {
             const result = getTypedValue('true', { name: 'arg1', type: 'boolean' });
             expect(result).toBe(true);
         });
-        test('valid false boolean', () =>
+        it('valid false boolean', () =>
         {
             const result = getTypedValue('false', { name: 'arg1', type: 'boolean' });
             expect(result).toBe(false);
         });
-        test('invalid boolean', () =>
+        it('invalid boolean', () =>
         {
             expect(() => getTypedValue('other', { name: 'arg1', type: 'boolean' })).toThrow("Unable to convert argument arg1 with value 'other' into a value of type boolean");
         });
-        test('invalid float', () =>
+        it('invalid float', () =>
         {
             expect(() => getTypedValue('eleven point one', { name: 'arg1', type: 'float' })).toThrow("Unable to convert argument arg1 with value 'eleven point one' into a value of type float");
         });
     });
     describe('factory parsing', () =>
     {
-        test('valid int', () =>
+        it('valid int', () =>
         {
             const result = getFactoryValue('11', { name: 'arg1', factory: sampleNumberFactory });
             expect(result).toBe(11);
         });
-        test('invalid int', () =>
+        it('invalid int', () =>
         {
             expect(() => getFactoryValue('eleven', { name: 'arg1', factory: sampleNumberFactory })).toThrow('');
         });
     });
     describe('positional arguments', () =>
     {
-        test('get correct string values', () =>
+        it('get correct string values', () =>
         {
             interface IArgs
             {
@@ -100,7 +100,7 @@ describe('argument parsing', () =>
                 expect(result.three).toBe('333');
             }
         });
-        test('get correct int values', () =>
+        it('get correct int values', () =>
         {
             interface IArgs
             {
@@ -130,7 +130,7 @@ describe('argument parsing', () =>
                 expect(result.three).toBe(333);
             }
         });
-        test('throw if value missing', () =>
+        it('throw if value missing', () =>
         {
             interface IArgs
             {
@@ -152,10 +152,157 @@ describe('argument parsing', () =>
             ];
             expect(() => getArgs<IArgs>({ definitions: argDefs })).toThrow("'three' at position 3 is missing a value")
         });
+        it('get positional with named', () =>
+        {
+            interface IArgs
+            {
+                pos1: string;
+                pos2: string;
+                named: string;
+            }
+
+            const argDefs: IArgDef<any>[] = [
+                { name: 'pos2', index: 1 },
+                { name: 'named' },
+                { name: 'pos1', index: 0 },
+            ];
+            process.argv = [
+                'ts-node',
+                'my-script',
+                '111',
+                '222',
+                '--named=aName',
+            ];
+            const result = getArgs<IArgs>({ definitions: argDefs });
+            expect(result).not.toBeNull();
+            if (result)
+            {
+                expect(result.pos1).toBe('111');
+                expect(result.pos2).toBe('222');
+                expect(result.named).toBe('aName')
+            }
+        });
+        it('get positional with named and optional present', () =>
+        {
+            interface IArgs
+            {
+                pos1: string;
+                pos2?: string;
+                named: string;
+            }
+
+            const argDefs: IArgDef<any>[] = [
+                { name: 'pos2', index: 1, required: false },
+                { name: 'named' },
+                { name: 'pos1', index: 0 },
+            ];
+            process.argv = [
+                'ts-node',
+                'my-script',
+                '111',
+                '222',
+                '--named=aName',
+            ];
+            const result = getArgs<IArgs>({ definitions: argDefs });
+            expect(result).not.toBeNull();
+            if (result)
+            {
+                expect(result.pos1).toBe('111');
+                expect(result.pos2).toBe('222');
+                expect(result.named).toBe('aName')
+            }
+        });
+        it('get positional with named and optional missing', () =>
+        {
+            interface IArgs
+            {
+                pos1: string;
+                pos2?: string;
+                named: string;
+            }
+
+            const argDefs: IArgDef<any>[] = [
+                { name: 'pos2', index: 1, required: false },
+                { name: 'named' },
+                { name: 'pos1', index: 0 },
+            ];
+            process.argv = [
+                'ts-node',
+                'my-script',
+                '111',
+                '--named=aName',
+            ];
+            const result = getArgs<IArgs>({ definitions: argDefs });
+            expect(result).not.toBeNull();
+            if (result)
+            {
+                expect(result.pos1).toBe('111');
+                expect(result.pos2).toBeUndefined();
+                expect(result.named).toBe('aName')
+            }
+        });
+        it('with optional last positional argument', () =>
+        {
+            interface IArgs
+            {
+                one: string;
+                two: string;
+                three?: string;
+            }
+
+            const argDefs: IArgDef<any>[] = [
+                { name: 'three', index: 2, required: false },
+                { name: 'one', index: 0 },
+                { name: 'two', index: 1 },
+            ];
+            process.argv = [
+                'ts-node',
+                'my-script',
+                '111',
+                '222',
+            ];
+            const result = getArgs<IArgs>({ definitions: argDefs });
+            expect(result).not.toBeNull();
+            if (result)
+            {
+                expect(result.one).toBe('111');
+                expect(result.two).toBe('222');
+                expect(result.three).toBeUndefined();
+            }
+        });
+        it('one optional positional and named', () =>
+        {
+            interface IArgs
+            {
+                pos1?: string;
+                named1?: string;
+                named2?: string;
+            }
+
+            const argDefs: IArgDef<any>[] = [
+                { name: 'pos1', index: 0, required: false },
+                { name: 'named1' },
+                { name: 'named2' },
+            ];
+            process.argv = [
+                'ts-node',
+                'my-script',
+                '111',
+                '--named1=222',
+            ];
+            const result = getArgs<IArgs>({ definitions: argDefs });
+            expect(result).not.toBeNull();
+            if (result)
+            {
+                expect(result.pos1).toBe('111');
+                expect(result.named1).toBe('222');
+                expect(result.named2).toBeUndefined();
+            }
+        });
     });
     describe('named arguments', () =>
     {
-        test('get named value', () =>
+        it('get named value', () =>
         {
             const argDefs: IArgDef<any>[] = [
                 { name: 'arg1' },
@@ -167,7 +314,7 @@ describe('argument parsing', () =>
             expect(result.strVal).toBe('111');
             expect(result.def?.name).toBe('arg1');
         });
-        test('get named value with no definition', () =>
+        it('get named value with no definition', () =>
         {
             const argDefs: IArgDef<any>[] = [
                 { name: 'arg1' },
@@ -175,7 +322,7 @@ describe('argument parsing', () =>
             ];
             expect(() => getNamedArgVal('--arg3=333', argDefs)).toThrow("Could not find a definition for argument '--arg3=333' with name 'arg3' and value '333'");
         });
-        test('required missing', () =>
+        it('required missing', () =>
         {
             const argDefs: IArgDef<any>[] = [
                 { name: 'arg1', required: true },
@@ -184,7 +331,7 @@ describe('argument parsing', () =>
             process.argv = ['ts-node', 'script', '--arg2=222'];
             expect(() => getArgs({ definitions: argDefs })).toThrow("'arg1' is required, but no value was specified for it.");
         });
-        test('get correct string values', () =>
+        it('get correct string values', () =>
         {
             interface IArgs
             {
@@ -214,7 +361,7 @@ describe('argument parsing', () =>
                 expect(result.three).toBe('333');
             }
         });
-        test('get correct int values', () =>
+        it('get correct int values', () =>
         {
             interface IArgs
             {
@@ -240,7 +387,7 @@ describe('argument parsing', () =>
                 expect(result.three).toBe(333);
             }
         });
-        test('get correct mixed values', () =>
+        it('get correct mixed values', () =>
         {
             interface IArgs
             {
@@ -267,7 +414,7 @@ describe('argument parsing', () =>
             }
         });
 
-        test('get correct boolean value (true)', () =>
+        it('get correct boolean value (true)', () =>
         {
             interface IArgs
             {
@@ -295,7 +442,7 @@ describe('argument parsing', () =>
             }
         });
 
-        test('get correct boolean value (false)', () =>
+        it('get correct boolean value (false)', () =>
         {
             interface IArgs
             {
@@ -323,7 +470,7 @@ describe('argument parsing', () =>
             }
         });
 
-        test('get correct boolean value (undefined)', () =>
+        it('get correct boolean value (undefined)', () =>
         {
             interface IArgs
             {
@@ -350,7 +497,7 @@ describe('argument parsing', () =>
             }
         });
 
-        test('get correct boolean value (true without flag)', () =>
+        it('get correct boolean value (true without flag)', () =>
         {
             interface IArgs
             {
@@ -380,7 +527,7 @@ describe('argument parsing', () =>
     });
     describe('extra args', () =>
     {
-        test('named arg', () =>
+        it('named arg', () =>
         {
             const argDefs: IArgDef<any>[] = [
                 { name: 'arg1' },
@@ -389,7 +536,7 @@ describe('argument parsing', () =>
             process.argv = ['ts-node', 'script', '--arg1=one', '--arg3=fail', '--arg2=222']
             expect(() => getArgs({ definitions: argDefs })).toThrow("Could not find a definition for argument '--arg3=fail' with name 'arg3' and value 'fail'");
         });
-        test('named arg with valid positional', () =>
+        it('named arg with valid positional', () =>
         {
             const argDefs: IArgDef<any>[] = [
                 { name: 'arg1', index: 0 },
@@ -398,7 +545,7 @@ describe('argument parsing', () =>
             process.argv = ['ts-node', 'script', 'one', 'two', '--arg3=fail']
             expect(() => getArgs({ definitions: argDefs })).toThrow("Could not find a definition for argument '--arg3=fail' with name 'arg3' and value 'fail'");
         });
-        test('positional', () =>
+        it('positional', () =>
         {
             const argDefs: IArgDef<any>[] = [
                 { name: 'arg1', index: 0 },
@@ -406,7 +553,7 @@ describe('argument parsing', () =>
             process.argv = ['ts-node', 'script', 'one', 'two']
             expect(() => getArgs({ definitions: argDefs })).toThrow("'two' does not appear to be a valid named or positional argument");
         });
-        test('positional with valid named', () =>
+        it('positional with valid named', () =>
         {
             const argDefs: IArgDef<any>[] = [
                 { name: 'arg1', index: 0 },
@@ -415,14 +562,14 @@ describe('argument parsing', () =>
             process.argv = ['ts-node', 'script', 'one', '--arg2=two', 'badone']
             expect(() => getArgs({ definitions: argDefs })).toThrow("'badone' does not appear to be a valid named or positional argument");
         });
-        test('named before positional', () =>
+        it('named before positional', () =>
         {
             const argDefs: IArgDef<any>[] = [
                 { name: 'arg1', index: 0 },
                 { name: 'arg2' },
             ];
             process.argv = ['ts-node', 'script', '--arg2=two', 'one']
-            expect(() => getArgs({ definitions: argDefs })).toThrow("'arg1' at position 1 must not contain hyphens in its value");
+            expect(() => getArgs({ definitions: argDefs })).toThrow("'arg1' at position 1 is missing a value");
         });
     });
 });

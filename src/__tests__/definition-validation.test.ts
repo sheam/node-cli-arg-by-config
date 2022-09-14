@@ -7,7 +7,7 @@ describe('definition validation', () =>
 {
     describe('validate positional arguments', () =>
     {
-        test('validates when sequence correct', () =>
+        it('validates when sequence correct', () =>
         {
             const defs: IArgDef<any>[] = [
                 { name: 'pos1', index: 0, type: 'string' },
@@ -17,7 +17,7 @@ describe('definition validation', () =>
 
             validateArgDefinitions({ definitions: defs });
         });
-        test('index values must be sequential', () =>
+        it('index values must be sequential', () =>
         {
             const defs: IArgDef<any>[] = [
                 { name: 'pos1', index: 0, type: 'string' },
@@ -28,7 +28,18 @@ describe('definition validation', () =>
             const expectedError = "Definition for argument 'pos2' has an invalid index value (2). Should it be 1?";
             expect(() => validateArgDefinitions({ definitions: defs })).toThrow(expectedError);
         });
-        test('should not be marked as optional', () =>
+        it('should fail if non-last-positional argument is optional', () =>
+        {
+            const defs: IArgDef<any>[] = [
+                { name: 'pos1', index: 0, type: 'string', required: false },
+                { name: 'opt1', type: 'string' },
+                { name: 'pos2', index: 1, type: 'string' },
+            ];
+
+            const expectedError = "Definition for argument 'pos1' has an invalid value (false) for 'required'. Only the last indexed argument can be optional.";
+            expect(() => validateArgDefinitions({ definitions: defs })).toThrow(expectedError);
+        });
+        it('only last positional can be marked false', () =>
         {
             const defs: IArgDef<any>[] = [
                 { name: 'pos1', index: 0, type: 'string' },
@@ -36,13 +47,12 @@ describe('definition validation', () =>
                 { name: 'pos2', index: 1, type: 'string', required: false },
             ];
 
-            const expectedError = "Definition for argument 'pos2' has an invalid value (false) for 'required'. Positional arguments are always required.";
-            expect(() => validateArgDefinitions({ definitions: defs })).toThrow(expectedError);
+            expect(() => validateArgDefinitions({ definitions: defs })).not.toThrow();
         });
     });
     describe('exactly 1 of type or factory must be supplied', () =>
     {
-        test('type supplied', () =>
+        it('type supplied', () =>
         {
 
             const defs: IArgDef<any>[] = [
@@ -51,7 +61,7 @@ describe('definition validation', () =>
 
             validateArgDefinitions({ definitions: defs });
         });
-        test('factory supplied', () =>
+        it('factory supplied', () =>
         {
 
             const defs: IArgDef<any>[] = [
@@ -61,7 +71,7 @@ describe('definition validation', () =>
             validateArgDefinitions({ definitions: defs });
             expect(() => validateArgDefinitions({ definitions: defs })).not.toThrow();
         });
-        test('must not specify both', () =>
+        it('must not specify both', () =>
         {
 
             const defs: IArgDef<any>[] = [
@@ -74,7 +84,7 @@ describe('definition validation', () =>
     });
     describe('one one of each name', () =>
     {
-        test('duplicate arg', () =>
+        it('duplicate arg', () =>
         {
             const defs: IArgDef<any>[] = [
                 { name: 'arg1' },
@@ -85,7 +95,7 @@ describe('definition validation', () =>
             const expectedError = "There is more than one definition specified for 'arg1'.";
             expect(() => validateArgDefinitions({ definitions: defs })).toThrow(expectedError);
         });
-        test('duplicate help', () =>
+        it('duplicate help', () =>
         {
             const defs: IArgDef<any>[] = [
                 { name: 'help' }
@@ -94,7 +104,7 @@ describe('definition validation', () =>
             const expectedError = "There is more than one definition specified for 'help'.";
             expect(() => validateArgDefinitions({ definitions: defs })).toThrow(expectedError);
         });
-        test('duplicate help avoided', () =>
+        it('duplicate help avoided', () =>
         {
             const defs: IArgDef<any>[] = [
                 { name: 'help' }

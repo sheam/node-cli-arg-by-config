@@ -62,7 +62,7 @@ console.log(`arg3 plus one is ${args.arg3+1}`);
 * @param type: type of value. If not set, and factory not set, assume 'string'. Mstring, number, date are accepted.
 * @param description: description that will appear in helper.
 * @param index: for required positional parameters. Starting at 0, ignoring interpreter and script name. i.e., ts-node npm-script arg0 arg1...
-* @param required: set to true if this argument is required. Not needed for indexed params.
+* @param required: set to true if this argument is required. Positional default to true. Only last positional can be optional.
 * @param factory: a function which converts a string value into a TVal
 * @param validator: a function which verifies that the constructed value is correct. It returns an error message if not valid.
 
